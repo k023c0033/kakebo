@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { CATEGORIES, PAYMENT_METHODS } from '../constants.js'
-import { todayIso } from '../format.js'
+import { parseAmount, todayIso } from '../format.js'
 
 // 支出の手入力。レシートから読んだ内容（draft）があれば最初から入れておく。
 export default function AddExpenseScreen({ draft, onSave }) {
@@ -14,7 +14,7 @@ export default function AddExpenseScreen({ draft, onSave }) {
 
   function handleSubmit(event) {
     event.preventDefault()
-    const value = Number(amount.normalize('NFKC').replace(/[,\s円¥]/g, ''))
+    const value = parseAmount(amount)
     if (!Number.isInteger(value) || value <= 0) {
       setError('金額は1円以上の数字で入れてください')
       return
@@ -35,8 +35,7 @@ export default function AddExpenseScreen({ draft, onSave }) {
   }
 
   return (
-    <section className="screen">
-      <h2>支出を入力</h2>
+    <>
       {draft && <p className="notice">レシートから読んだ内容を入れました。まちがいがないか確かめてください。</p>}
 
       <form className="form" onSubmit={handleSubmit} noValidate>
@@ -98,6 +97,6 @@ export default function AddExpenseScreen({ draft, onSave }) {
 
         <button type="submit" className="primary-button">保存する</button>
       </form>
-    </section>
+    </>
   )
 }

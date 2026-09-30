@@ -27,3 +27,8 @@ export function formatMonth(key) {
   const [y, m] = key.split('-').map(Number)
   return `${y}年${m}月`
 }
+
+// 「1,200円」「１２００」なども数字として読む。読めなければ NaN。
+export function parseAmount(text) {
+  return Number(text.normalize('NFKC').replace(/[,\s円¥]/g, ''))
+}

@@ -13,10 +13,20 @@ export const PAYMENT_METHODS = [
   { id: 'qr', label: 'QR決済' },
 ]
 
+// 収入の種類は2つ
+export const INCOME_TYPES = [
+  { id: 'salary', label: '給料' },
+  { id: 'allowance', label: '仕送り' },
+]
+
 export function categoryOf(id) {
   return CATEGORIES.find((c) => c.id === id) ?? CATEGORIES[CATEGORIES.length - 1]
 }
 
 export function paymentLabel(id) {
   return PAYMENT_METHODS.find((p) => p.id === id)?.label ?? ''
+}
+
+export function incomeTypeLabel(id) {
+  return INCOME_TYPES.find((t) => t.id === id)?.label ?? ''
 }
