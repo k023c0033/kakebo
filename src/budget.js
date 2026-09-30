@@ -31,3 +31,10 @@ export function budgetAlert(level, spent, budget, monthLabel) {
   }
   return { title: `${monthLabel}の予算の80%をこえました`, body: `予算の${percent}%を使っています。残りの日数を考えて使いましょう。` }
 }
+
+// 今日をふくめて、月末まであと何日あるか（月は1日始まり）
+export function daysLeftInMonth(isoDate) {
+  const [y, m, d] = isoDate.split('-').map(Number)
+  const lastDay = new Date(y, m, 0).getDate()
+  return lastDay - d + 1
+}

@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { budgetLevel, usageRatio } from '../budget.js'
+import { budgetLevel, daysLeftInMonth, usageRatio } from '../budget.js'
 import { formatYen, parseAmount } from '../format.js'
 import { askNotificationPermission, notificationPermission } from '../notify.js'
 
-// ホームの「今月の予算」。使った割合をバーで見せ、予算の金額もここで決める。
-export default function BudgetCard({ spent, budget, onChange }) {
+// ホームのいちばん上。「今月あといくら使えるか」を大きく見せ、予算の金額もここで決める。
+export default function BudgetCard({ spent, income, budget, today, onChange }) {
   const [editing, setEditing] = useState(false)
   const [text, setText] = useState(budget ? String(budget) : '')
   const [error, setError] = useState('')
@@ -27,11 +27,13 @@ export default function BudgetCard({ spent, budget, onChange }) {
 
   if (editing || !budget) {
     return (
-      <div className="card">
-        <h3 className="card-title">今月の予算</h3>
+      <div className="card hero">
+        {editing && <h3 className="card-title">今月の予算</h3>}
         {!editing && (
           <>
-            <p className="hint">1か月に使ってよい金額を決めると、80%と100%をこえたときにお知らせします。</p>
+            <p className="hero-label">今月の収入−支出</p>
+            <p className={income - spent < 0 ? 'hero-amount minus' : 'hero-amount'}>{formatYen(income - spent)}</p>
+            <p className="hint">1か月に使ってよい金額（予算）を決めると、ここに「あと使えるお金」が出て、80%と100%をこえたときにお知らせします。</p>
             <button type="button" className="primary-button" onClick={() => setEditing(true)}>予算を決める</button>
           </>
         )}
@@ -78,21 +80,27 @@ export default function BudgetCard({ spent, budget, onChange }) {
   const ratio = usageRatio(spent, budget)
   const level = budgetLevel(spent, budget)
   const left = budget - spent
+  const days = daysLeftInMonth(today)
 
   return (
-    <div className={`card budget ${level}`}>
+    <div className={`card hero budget ${level}`}>
       <div className="card-head">
-        <h3 className="card-title">今月の予算 {formatYen(budget)}</h3>
-        <button type="button" className="link-button" onClick={() => setEditing(true)}>変える</button>
+        <p className="hero-label">{left >= 0 ? '今月あと使えるお金' : '今月の予算をこえた金額'}</p>
+        <button type="button" className="link-button" onClick={() => setEditing(true)}>予算を変える</button>
       </div>
+      <p className={left >= 0 ? 'hero-amount' : 'hero-amount minus'}>{formatYen(Math.abs(left))}</p>
       <div className="meter" role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(ratio * 100)} aria-label="予算を使った割合">
         <div className="meter-fill" style={{ width: `${Math.min(ratio, 1) * 100}%` }} />
         <div className="meter-mark" style={{ left: '80%' }} aria-hidden="true" />
       </div>
       <p className="budget-text">
-        {Math.floor(ratio * 100)}% 使用・
-        {left >= 0 ? `あと ${formatYen(left)}` : `${formatYen(-left)} オーバー`}
+        予算 {formatYen(budget)} のうち {formatYen(spent)} 使用（{Math.floor(ratio * 100)}%）
       </p>
+      {left > 0 && (
+        <p className="per-day">
+          月末まであと{days}日・1日あたり <strong>{formatYen(Math.floor(left / days))}</strong>
+        </p>
+      )}
       {permission === 'default' && (
         <button type="button" className="secondary-button" onClick={handleAllow}>スマホの通知をオンにする</button>
       )}

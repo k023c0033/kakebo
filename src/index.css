@@ -426,7 +426,8 @@ input {
 
 .summary {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
   gap: 8px;
   margin: 0 0 12px;
 }
@@ -593,4 +594,141 @@ input {
 .segmented button.selected {
   background: var(--surface);
   color: var(--text);
+}
+
+/* ホーム：いちばん上の「あと使えるお金」 */
+.home-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.home-main {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.home .summary {
+  margin: 0;
+}
+
+.hero {
+  padding: 16px 18px;
+}
+
+.hero-label {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.hero-amount {
+  margin: -4px 0 0;
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.budget.warn .hero-amount {
+  color: var(--warn);
+}
+
+.budget-text {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.budget.warn .budget-text,
+.budget.over .budget-text {
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.per-day {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.per-day strong {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ホーム：支出の内わけ（小さい円グラフ＋一覧を横に並べる） */
+.home-side .empty {
+  margin: 0;
+}
+
+.breakdown {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.breakdown .donut {
+  width: 104px;
+  flex: none;
+}
+
+.breakdown .donut-hole {
+  background: var(--surface);
+}
+
+.breakdown .legend {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border-radius: 0;
+}
+
+.breakdown .legend li {
+  padding: 6px 0;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.breakdown .legend li.zero {
+  color: var(--muted);
+}
+
+.legend-percent {
+  min-width: 2.6em;
+  text-align: right;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* PCなど横に広い画面では、ホームを左右2列にする */
+@media (min-width: 768px) {
+  .app,
+  .tab-bar {
+    max-width: 960px;
+  }
+
+  .screen {
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  .screen.home {
+    max-width: none;
+  }
+
+  .home-grid {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    align-items: start;
+  }
+
+  .breakdown {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .breakdown .donut {
+    width: 160px;
+    align-self: center;
+  }
 }

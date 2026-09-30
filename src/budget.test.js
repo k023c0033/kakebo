@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { budgetAlert, budgetLevel, crossedLevel } from './budget.js'
+import { budgetAlert, budgetLevel, crossedLevel, daysLeftInMonth } from './budget.js'
 import { loadBudget, loadIncomes, saveBudget, saveIncomes } from './storage.js'
 import { parseAmount } from './format.js'
 
@@ -55,5 +55,13 @@ describe('parseAmount', () => {
     expect(parseAmount('１，２００円')).toBe(1200)
     expect(parseAmount('¥50,000')).toBe(50000)
     expect(Number.isNaN(parseAmount('abc'))).toBe(true)
+  })
+})
+
+describe('daysLeftInMonth', () => {
+  it('今日をふくめて月末までの日数', () => {
+    expect(daysLeftInMonth('2026-09-30')).toBe(1)
+    expect(daysLeftInMonth('2026-09-01')).toBe(30)
+    expect(daysLeftInMonth('2028-02-01')).toBe(29)
   })
 })
