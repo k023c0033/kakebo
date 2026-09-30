@@ -36,4 +36,5 @@ npm run dev      # 開発用に起動。表示された http://localhost:5173/ka
 - レシートの文字読み取りは [Tesseract.js](https://tesseract.projectnaptha.com/) で、スマホのブラウザの中だけで行います。初回だけ日本語の読み取り用データ（数MB）をダウンロードします。
 - 読み取った文字から日付・合計を探す処理は `src/receipt/parseReceipt.js` にあります。
 - 支出データはいまは `localStorage` に保存しています。レシート画像を保存するようになったら、容量の大きい IndexedDB に移す予定です。
-- 公開先は GitHub Pages（`https://k023c0033.github.io/kakebo/`）の予定です。
+- 公開先は GitHub Pages（https://k023c0033.github.io/kakebo/ ）です。`main` に変更が入ると `.github/workflows/deploy.yml` が自動で組み立てて公開します。
+  - 初回だけ、GitHub の Settings → Pages → Build and deployment の Source を「GitHub Actions」にしておく必要があります。
