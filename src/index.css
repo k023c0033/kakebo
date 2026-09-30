@@ -397,3 +397,200 @@ input {
   padding: 12px;
   border-radius: 8px;
 }
+
+/* 収入・予算 */
+:root {
+  --income: #2e8b57;
+  --warn: #d98b00;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --income: #6cc991;
+    --warn: #f0b440;
+  }
+}
+
+.income-amount {
+  color: var(--income);
+}
+
+.minus {
+  color: var(--danger);
+}
+
+.section-title {
+  font-size: 0.95rem;
+  margin: 24px 0 8px;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.summary > div {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 10px 12px;
+  min-width: 0;
+}
+
+.summary dt {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.summary dd {
+  margin: 0;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.card {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.card-title {
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.card .hint {
+  margin: 0;
+}
+
+.meter {
+  position: relative;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--track);
+  overflow: hidden;
+}
+
+.meter-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.budget.warn .meter-fill {
+  background: var(--warn);
+}
+
+.budget.over .meter-fill {
+  background: var(--danger);
+}
+
+.meter-mark {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--bg);
+}
+
+.budget-text {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.budget.warn .budget-text {
+  color: var(--warn);
+  font-weight: 700;
+}
+
+.budget.over .budget-text {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.budget-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.budget-form .link-button {
+  align-self: flex-start;
+  padding: 0;
+}
+
+.button-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 8px;
+}
+
+.secondary-button {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.budget-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 12px 8px 12px 14px;
+  border-radius: 12px;
+  background: var(--surface);
+  border-left: 5px solid var(--warn);
+}
+
+.budget-alert.over {
+  border-left-color: var(--danger);
+}
+
+.budget-alert > div {
+  flex: 1;
+}
+
+.budget-alert p {
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* 入力画面の「支出／収入」切り替え */
+.segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 4px;
+  margin-bottom: 18px;
+  border-radius: 12px;
+  background: var(--track);
+}
+
+.segmented button {
+  padding: 8px;
+  border: 0;
+  border-radius: 9px;
+  background: none;
+  color: var(--muted);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.segmented button.selected {
+  background: var(--surface);
+  color: var(--text);
+}

@@ -1,16 +1,37 @@
 import { expensesInMonth, totalOf, totalsByCategory } from '../expenses.js'
 import { formatMonth, formatYen, monthKey, todayIso } from '../format.js'
+import BudgetCard from './BudgetCard.jsx'
 
-// 今月の支出をカテゴリ別の円グラフで見せる
-export default function HomeScreen({ expenses, onAdd }) {
+// 今月の収入・支出・予算と、支出のカテゴリ別の円グラフを見せる
+export default function HomeScreen({ expenses, incomes, budget, onBudgetChange, onAdd }) {
   const key = monthKey(todayIso())
   const thisMonth = expensesInMonth(expenses, key)
   const total = totalOf(thisMonth)
+  const income = totalOf(expensesInMonth(incomes, key))
   const byCategory = totalsByCategory(thisMonth)
 
   return (
     <section className="screen">
-      <h2>{formatMonth(key)}の支出</h2>
+      <h2>{formatMonth(key)}</h2>
+
+      <dl className="summary">
+        <div>
+          <dt>収入</dt>
+          <dd className="income-amount">{formatYen(income)}</dd>
+        </div>
+        <div>
+          <dt>支出</dt>
+          <dd>{formatYen(total)}</dd>
+        </div>
+        <div>
+          <dt>収入−支出</dt>
+          <dd className={income - total < 0 ? 'minus' : ''}>{formatYen(income - total)}</dd>
+        </div>
+      </dl>
+
+      <BudgetCard spent={total} budget={budget} onChange={onBudgetChange} />
+
+      <h3 className="section-title">支出の内わけ</h3>
 
       <div className="donut-wrap">
         <div className="donut" style={{ background: donutBackground(byCategory, total) }} role="img" aria-label="カテゴリ別の支出の円グラフ">
