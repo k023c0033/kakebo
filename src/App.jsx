@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { loadBudget, loadExpenses, loadIncomes, newId, saveBudget, saveExpenses, saveIncomes } from './storage.js'
+import { loadBalance, loadBudget, loadExpenses, loadIncomes, newId, saveBalance, saveBudget, saveExpenses, saveIncomes } from './storage.js'
 import { budgetAlert, crossedLevel } from './budget.js'
 import { expensesInMonth, totalOf } from './expenses.js'
 import { formatMonth, monthKey } from './format.js'
@@ -21,6 +21,7 @@ export default function App() {
   const [expenses, setExpenses] = useState(loadExpenses)
   const [incomes, setIncomes] = useState(loadIncomes)
   const [budget, setBudget] = useState(loadBudget)
+  const [balance, setBalance] = useState(loadBalance)
   // 予算の80%・100%をこえたときにアプリの中に出すお知らせ
   const [alert, setAlert] = useState(null)
   // レシートから読んだ内容を入力画面に渡すための下書き
@@ -42,6 +43,10 @@ export default function App() {
   useEffect(() => {
     saveBudget(budget)
   }, [budget])
+
+  useEffect(() => {
+    saveBalance(balance)
+  }, [balance])
 
   function addExpense(expense) {
     const key = monthKey(expense.date)
@@ -96,7 +101,15 @@ export default function App() {
         )}
 
         {tab === 'home' && (
-          <HomeScreen expenses={expenses} incomes={incomes} budget={budget} onBudgetChange={setBudget} onAdd={() => setTab('add')} />
+          <HomeScreen
+            expenses={expenses}
+            incomes={incomes}
+            budget={budget}
+            balance={balance}
+            onBudgetChange={setBudget}
+            onBalanceChange={(amount) => setBalance(amount == null ? null : { amount, setAt: Date.now() })}
+            onAdd={() => setTab('add')}
+          />
         )}
         {tab === 'add' && (
           <AddScreen key={draft ? 'draft' : 'blank'} draft={draft} onSaveExpense={addExpense} onSaveIncome={addIncome} />

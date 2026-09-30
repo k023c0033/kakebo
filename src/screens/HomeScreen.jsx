@@ -1,16 +1,21 @@
+import { useState } from 'react'
 import { expensesInMonth, totalOf, totalsByCategory } from '../expenses.js'
 import { formatMonth, formatYen, monthKey, todayIso } from '../format.js'
+import { currentBalance } from '../balance.js'
 import BudgetCard from './BudgetCard.jsx'
+import BalanceForm from './BalanceForm.jsx'
 
 // ホーム。いちばん上で「今月あといくら使えるか」をひと目で見せ、
 // その下に収入・支出、支出の内わけを小さくまとめる。
-export default function HomeScreen({ expenses, incomes, budget, onBudgetChange, onAdd }) {
+export default function HomeScreen({ expenses, incomes, budget, balance, onBudgetChange, onBalanceChange, onAdd }) {
+  const [editingBalance, setEditingBalance] = useState(false)
   const today = todayIso()
   const key = monthKey(today)
   const thisMonth = expensesInMonth(expenses, key)
   const total = totalOf(thisMonth)
   const income = totalOf(expensesInMonth(incomes, key))
   const byCategory = totalsByCategory(thisMonth)
+  const nowBalance = currentBalance(balance, expenses, incomes)
 
   return (
     <section className="screen home">
@@ -22,21 +27,35 @@ export default function HomeScreen({ expenses, incomes, budget, onBudgetChange, 
 
           <dl className="summary">
             <div>
-              <dt>収入</dt>
+              <dt>
+                口座残高<span className="edit-mark" aria-hidden="true"> ✎</span>
+              </dt>
+              <dd>
+                <button type="button" className="balance-button" onClick={() => setEditingBalance(true)} aria-label="口座残高を入れる・直す">
+                  {nowBalance == null ? <span className="unset">入れる</span> : <span className={nowBalance < 0 ? 'minus' : ''}>{formatYen(nowBalance)}</span>}
+                </button>
+              </dd>
+            </div>
+            <div>
+              <dt>今月の収入</dt>
               <dd className="income-amount">{formatYen(income)}</dd>
             </div>
             <div>
-              <dt>支出</dt>
+              <dt>今月の支出</dt>
               <dd>{formatYen(total)}</dd>
             </div>
-            {/* 予算がないときは上の大きい数字が「収入−支出」なので、ここには出さない */}
-            {budget && (
-              <div>
-                <dt>収入−支出</dt>
-                <dd className={income - total < 0 ? 'minus' : ''}>{formatYen(income - total)}</dd>
-              </div>
-            )}
           </dl>
+
+          {editingBalance && (
+            <BalanceForm
+              current={nowBalance}
+              onSave={(amount) => {
+                onBalanceChange(amount)
+                setEditingBalance(false)
+              }}
+              onCancel={() => setEditingBalance(false)}
+            />
+          )}
         </div>
 
         <div className="card home-side">

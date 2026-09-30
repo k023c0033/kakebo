@@ -435,7 +435,7 @@ input {
 .summary > div {
   background: var(--surface);
   border-radius: 12px;
-  padding: 10px 12px;
+  padding: 10px 10px;
   min-width: 0;
 }
 
@@ -448,7 +448,8 @@ input {
   margin: 0;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  overflow-wrap: anywhere;
+  font-size: clamp(0.9rem, 4.2vw, 1.1rem);
+  white-space: nowrap;
 }
 
 .card {
@@ -731,4 +732,29 @@ input {
     width: 160px;
     align-self: center;
   }
+}
+
+/* ホーム：口座残高（押すと入れ直せる） */
+.balance-button {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  text-align: left;
+}
+
+.balance-button .unset {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.edit-mark {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--muted);
 }
