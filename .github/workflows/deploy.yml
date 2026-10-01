@@ -1,5 +1,5 @@
 # main に変更が入るたびに、アプリを組み立てて GitHub Pages に公開する。
-# 公開先: https://k023c0033.github.io/kakebo/
+# 公開先: https://rinchan-codes.github.io/kakebo/
 name: Deploy to GitHub Pages
 
 on:
