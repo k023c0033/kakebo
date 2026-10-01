@@ -5,4 +5,6 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   base: '/kakebo/',
   plugins: [react()],
+  // 同期用の Firebase の部品（約600KB）は、同期を使うときだけ別に読み込むので大きくてよい
+  build: { chunkSizeWarningLimit: 700 },
 })
