@@ -1,5 +1,18 @@
 import { useEffect, useState } from 'react'
-import { loadBalance, loadBudget, loadExpenses, loadIncomes, newId, saveBalance, saveBudget, saveExpenses, saveIncomes } from './storage.js'
+import {
+  loadBalance,
+  loadBudget,
+  loadExpenses,
+  loadIncomes,
+  loadLastBackup,
+  newId,
+  requestPersistentStorage,
+  saveBalance,
+  saveBudget,
+  saveExpenses,
+  saveIncomes,
+  saveLastBackup,
+} from './storage.js'
 import { budgetAlert, crossedLevel } from './budget.js'
 import { expensesInMonth, totalOf } from './expenses.js'
 import { formatMonth, monthKey } from './format.js'
@@ -8,6 +21,7 @@ import HomeScreen from './screens/HomeScreen.jsx'
 import AddScreen from './screens/AddScreen.jsx'
 import ListScreen from './screens/ListScreen.jsx'
 import ReceiptScreen from './screens/ReceiptScreen.jsx'
+import BackupCard from './screens/BackupCard.jsx'
 
 const TABS = [
   { id: 'home', label: 'ホーム', icon: '◔' },
@@ -22,6 +36,7 @@ export default function App() {
   const [incomes, setIncomes] = useState(loadIncomes)
   const [budget, setBudget] = useState(loadBudget)
   const [balance, setBalance] = useState(loadBalance)
+  const [lastBackup, setLastBackup] = useState(loadLastBackup)
   // 予算の80%・100%をこえたときにアプリの中に出すお知らせ
   const [alert, setAlert] = useState(null)
   // レシートから読んだ内容を入力画面に渡すための下書き
@@ -31,6 +46,11 @@ export default function App() {
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [tab])
+
+  // 記録がブラウザに勝手に消されないように頼んでおく
+  useEffect(() => {
+    requestPersistentStorage()
+  }, [])
 
   useEffect(() => {
     saveExpenses(expenses)
@@ -78,6 +98,18 @@ export default function App() {
     setIncomes((list) => list.filter((i) => i.id !== id))
   }
 
+  function handleExported(date) {
+    saveLastBackup(date)
+    setLastBackup(date)
+  }
+
+  function handleImport(data) {
+    setExpenses(data.expenses)
+    setIncomes(data.incomes)
+    setBudget(data.budget)
+    setBalance(data.balance)
+  }
+
   function handleReceiptResult(result) {
     setDraft(result)
     setTab('add')
@@ -109,6 +141,17 @@ export default function App() {
             onBudgetChange={setBudget}
             onBalanceChange={(amount) => setBalance(amount == null ? null : { amount, setAt: Date.now() })}
             onAdd={() => setTab('add')}
+          />
+        )}
+        {tab === 'home' && (
+          <BackupCard
+            expenses={expenses}
+            incomes={incomes}
+            budget={budget}
+            balance={balance}
+            lastBackup={lastBackup}
+            onExported={handleExported}
+            onImport={handleImport}
           />
         )}
         {tab === 'add' && (
