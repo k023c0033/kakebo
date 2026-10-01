@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
-import { readReceiptText } from '../receipt/ocr.js'
+import { readReceipt } from '../receipt/ocr.js'
 import { parseReceipt } from '../receipt/parseReceipt.js'
 import { formatDate, formatYen } from '../format.js'
 
-// 試作：レシート写真から日付・合計金額・店名がどれくらい読めるかを試す画面。
+// レシート写真から日付・合計金額・店名を読む画面。
+// 合計金額を読みまちがえたときは、レシートにあった金額をタップするだけで直せる。
 // 読めた内容はそのまま入力画面に渡せる。写真の保存はまだしない。
 export default function ReceiptScreen({ onUse }) {
   const [previewUrl, setPreviewUrl] = useState(null)
@@ -24,9 +25,9 @@ export default function ReceiptScreen({ onUse }) {
     setText('')
     setResult(null)
     try {
-      const ocrText = await readReceiptText(picked, setProgress)
+      const { text: ocrText, lines } = await readReceipt(picked, setProgress)
       setText(ocrText)
-      setResult(parseReceipt(ocrText))
+      setResult(parseReceipt(ocrText, lines))
       setStatus('done')
     } catch (err) {
       console.error(err)
@@ -36,8 +37,8 @@ export default function ReceiptScreen({ onUse }) {
 
   return (
     <section className="screen">
-      <h2>レシートを読む（試作）</h2>
-      <p className="hint">レシートを明るいところで、まっすぐ・大きめに撮ると読みやすくなります。</p>
+      <h2>レシートを読む</h2>
+      <p className="hint">レシートを机などに置いて、全体が入るように撮ってください。少しななめでも自動でまっすぐに直します。</p>
 
       <label className="primary-button file-button">
         写真を撮る・選ぶ
@@ -63,6 +64,24 @@ export default function ReceiptScreen({ onUse }) {
             <dd>{result.date ? formatDate(result.date) : '読めませんでした'}</dd>
             <dt>合計</dt>
             <dd>{result.total != null ? formatYen(result.total) : '読めませんでした'}</dd>
+            {result.amounts.length > 1 && (
+              <dd className="amount-choices">
+                <span className="hint">ちがうときは正しい金額をタップ</span>
+                <span className="chips">
+                  {result.amounts.map((value) => (
+                    <button
+                      key={value}
+                      type="button"
+                      className={value === result.total ? 'chip selected' : 'chip'}
+                      aria-pressed={value === result.total}
+                      onClick={() => setResult({ ...result, total: value })}
+                    >
+                      {formatYen(value)}
+                    </button>
+                  ))}
+                </span>
+              </dd>
+            )}
             <dt>お店</dt>
             <dd>{result.store ?? '読めませんでした'}</dd>
           </dl>
