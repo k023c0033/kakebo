@@ -1,4 +1,5 @@
-// レシート写真をまとめて読み取り、日付・合計・店名がどう読めたかを表示する（試作の精度確認用）。
+// レシート写真をまとめて読み取り、日付・合計・店名がどう読めたかを表示する（精度確認用）。
+// ※アプリの写真補正（切り出し・影消し）はブラウザの機能を使うので、ここでは写真をそのまま読む。
 // 使い方: npm run try-receipt -- 写真のフォルダ または 写真ファイル
 import { readdirSync, statSync } from 'node:fs'
 import { extname, join } from 'node:path'
@@ -24,6 +25,8 @@ if (targets.length === 0) {
 // LANG_PATH を指定すると、読み取り用データをネットからではなくそのフォルダから読む
 const options = process.env.LANG_PATH ? { langPath: process.env.LANG_PATH } : {}
 const worker = await createWorker(['jpn', 'eng'], 1, options)
+// アプリと同じ読み方（行ごとに読む）にそろえる
+await worker.setParameters({ tessedit_pageseg_mode: '6', preserve_interword_spaces: '1' })
 try {
   for (const file of targets.flatMap(listImages)) {
     const { data } = await worker.recognize(file)
