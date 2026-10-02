@@ -21,7 +21,7 @@ function download(text, fileName, type) {
 }
 
 // ホームのいちばん下。記録をファイルに書き出す・ファイルから戻す。
-export default function BackupCard({ expenses, incomes, budget, balance, lastBackup, onExported, onImport }) {
+export default function BackupCard({ synced, expenses, incomes, budget, balance, lastBackup, onExported, onImport }) {
   // 読み込む前の確認 { backup, preview } と、結果のお知らせ
   const [pending, setPending] = useState(null)
   const [message, setMessage] = useState(null)
@@ -66,7 +66,9 @@ export default function BackupCard({ expenses, incomes, budget, balance, lastBac
     <section className="card backup">
       <h3 className="card-title">バックアップ</h3>
       <p className="hint">
-        記録はこのスマホの中だけにあります。機種変更やデータ消去に備えて、ときどき書き出してください。
+        {synced
+          ? 'クラウドにも保存されていますが、念のため、ときどき書き出しておくと安心です。'
+          : '記録はこのスマホの中だけにあります。機種変更やデータ消去に備えて、ときどき書き出してください。'}
       </p>
       <p className={remind ? 'backup-last remind' : 'backup-last'}>
         前回の書き出し: {lastBackup ? formatDate(lastBackup) : 'まだありません'}

@@ -22,6 +22,9 @@ import AddScreen from './screens/AddScreen.jsx'
 import ListScreen from './screens/ListScreen.jsx'
 import ReceiptScreen from './screens/ReceiptScreen.jsx'
 import BackupCard from './screens/BackupCard.jsx'
+import SyncCard from './screens/SyncCard.jsx'
+import { useSync } from './sync/useSync.js'
+import { queueDelete, queueListChange, queuePut, queueSettings } from './sync/queue.js'
 
 const TABS = [
   { id: 'home', label: 'ホーム', icon: '◔' },
@@ -41,6 +44,13 @@ export default function App() {
   const [alert, setAlert] = useState(null)
   // レシートから読んだ内容を入力画面に渡すための下書き
   const [draft, setDraft] = useState(null)
+  // ログイン中は、クラウドから届いた変化（ほかの端末での記録）をここで画面に入れる
+  const sync = useSync({ expenses, incomes, budget, balance }, (data) => {
+    if ('expenses' in data) setExpenses(data.expenses)
+    if ('incomes' in data) setIncomes(data.incomes)
+    if ('budget' in data) setBudget(data.budget)
+    if ('balance' in data) setBalance(data.balance)
+  })
 
   // 画面を切り替えたら一番上から見せる（保存後のお知らせが隠れないように）
   useEffect(() => {
@@ -79,23 +89,29 @@ export default function App() {
     } else {
       setAlert(null)
     }
-    setExpenses((list) => [...list, { ...expense, id: newId(), createdAt: Date.now() }])
+    const record = { ...expense, id: newId(), createdAt: Date.now() }
+    setExpenses((list) => [...list, record])
+    sync.record((q) => queuePut(q, 'expenses', record))
     setDraft(null)
     setTab('list')
   }
 
   function addIncome(income) {
-    setIncomes((list) => [...list, { ...income, id: newId(), createdAt: Date.now() }])
+    const record = { ...income, id: newId(), createdAt: Date.now() }
+    setIncomes((list) => [...list, record])
+    sync.record((q) => queuePut(q, 'incomes', record))
     setAlert(null)
     setTab('list')
   }
 
   function deleteExpense(id) {
     setExpenses((list) => list.filter((e) => e.id !== id))
+    sync.record((q) => queueDelete(q, 'expenses', id))
   }
 
   function deleteIncome(id) {
     setIncomes((list) => list.filter((i) => i.id !== id))
+    sync.record((q) => queueDelete(q, 'incomes', id))
   }
 
   function handleExported(date) {
@@ -106,8 +122,19 @@ export default function App() {
   function handleImport(data) {
     setExpenses(data.expenses)
     setIncomes(data.incomes)
-    setBudget(data.budget)
-    setBalance(data.balance)
+    changeBudget(data.budget)
+    changeBalance(data.balance)
+    sync.record((q) => queueListChange(queueListChange(q, 'expenses', expenses, data.expenses), 'incomes', incomes, data.incomes))
+  }
+
+  function changeBudget(value) {
+    setBudget(value)
+    if (value !== budget) sync.record((q) => queueSettings(q, 'budget', value))
+  }
+
+  function changeBalance(value) {
+    setBalance(value)
+    if (value !== balance) sync.record((q) => queueSettings(q, 'balance', value))
   }
 
   function handleReceiptResult(result) {
@@ -138,13 +165,15 @@ export default function App() {
             incomes={incomes}
             budget={budget}
             balance={balance}
-            onBudgetChange={setBudget}
-            onBalanceChange={(amount) => setBalance(amount == null ? null : { amount, setAt: Date.now() })}
+            onBudgetChange={changeBudget}
+            onBalanceChange={(amount) => changeBalance(amount == null ? null : { amount, setAt: Date.now() })}
             onAdd={() => setTab('add')}
           />
         )}
+        {tab === 'home' && <SyncCard sync={sync} />}
         {tab === 'home' && (
           <BackupCard
+            synced={sync.status === 'signedIn'}
             expenses={expenses}
             incomes={incomes}
             budget={budget}
