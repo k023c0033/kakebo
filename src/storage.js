@@ -62,3 +62,27 @@ export function saveBalance(balance, storage = globalThis.localStorage) {
 export function newId() {
   return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`
 }
+
+// 最後にバックアップを書き出した日（'YYYY-MM-DD'）。まだなら null。
+const LAST_BACKUP_KEY = 'kakebo.lastBackup.v1'
+
+export function loadLastBackup(storage = globalThis.localStorage) {
+  const value = loadJson(LAST_BACKUP_KEY, null, storage)
+  return typeof value === 'string' ? value : null
+}
+
+export function saveLastBackup(date, storage = globalThis.localStorage) {
+  storage?.setItem(LAST_BACKUP_KEY, JSON.stringify(date))
+}
+
+// ブラウザに「容量が足りなくなってもこのデータは消さないで」と頼む。
+// 対応していないブラウザや、断られたときは何もしない。
+export async function requestPersistentStorage(storage = globalThis.navigator?.storage) {
+  try {
+    if (!storage?.persist) return false
+    if (await storage.persisted()) return true
+    return await storage.persist()
+  } catch {
+    return false
+  }
+}
