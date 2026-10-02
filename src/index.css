@@ -733,28 +733,3 @@ input {
     align-self: center;
   }
 }
-
-/* ホーム：口座残高（押すと入れ直せる） */
-.balance-button {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 4px;
-  padding: 0;
-  border: 0;
-  background: none;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  cursor: pointer;
-  text-align: left;
-}
-
-.balance-button .unset {
-  color: var(--accent);
-  text-decoration: underline;
-}
-
-.edit-mark {
-  font-size: 0.8rem;
-  font-weight: 400;
-  color: var(--muted);
-}
